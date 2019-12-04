@@ -1,0 +1,302 @@
+
+module LCD_WATCH_VFD( 
+	RESETN,CLK,
+	LCD_E, LCD_RS, LCD_RW, 
+	LCD_DATA,H10,H1,M10,M1,S10,S1
+);
+
+input RESETN, CLK;
+input [3:0]H10,H1,M10,M1,S10,S1;
+
+output LCD_E, LCD_RS, LCD_RW; 
+output [7:0] LCD_DATA;
+
+wire LCD_E;
+reg LCD_RS, LCD_RW; 
+reg [7:0] LCD_DATA;
+
+reg [2:0] STATE;
+parameter DELAY = 3'b000,
+	FUNCTION_SET = 3'b001, 
+	ENTRY_MODE = 3'b010,  
+	DISP_ONOFF=3'b011,
+	LINE1 = 3'b100,
+   LINE2 = 3'b101,
+	CLEAR_DISP = 3'b111;
+integer CNT;
+
+always @(posedge CLK) 
+	begin
+	if (RESETN == 1'b0) 
+		STATE = DELAY;
+	else
+		begin
+			case (STATE) 
+				DELAY :
+					if (CNT == 70) STATE = FUNCTION_SET; 
+				FUNCTION_SET :
+					if (CNT == 30) STATE = DISP_ONOFF; 
+				DISP_ONOFF :
+					if (CNT == 30) STATE = ENTRY_MODE; 
+				ENTRY_MODE :
+					if (CNT == 30) STATE = LINE1; 
+				LINE1 :
+					if (CNT == 20) STATE = LINE2; 
+				LINE2 :
+					if (CNT == 20) STATE = LINE1;
+				CLEAR_DISP :
+					if (CNT == 200) STATE = DELAY;
+				default : STATE = DELAY; 
+			endcase
+		end
+	end
+
+always @(posedge CLK) 
+	begin
+		if (RESETN == 1'b0) 
+			CNT = 0;
+		else
+			begin
+				case (STATE) 
+					DELAY :
+						if (CNT >= 70) CNT = 0; 
+						else CNT = CNT + 1;
+					FUNCTION_SET :
+						if (CNT >= 30) CNT = 0; 
+						else CNT = CNT + 1;
+					DISP_ONOFF :
+						if (CNT >= 30) CNT = 0; 
+						else CNT = CNT + 1;
+					ENTRY_MODE :
+						if (CNT >= 30) CNT = 0; 
+						else CNT = CNT + 1;
+					LINE1 :
+						if (CNT >= 20) CNT = 0; 
+						else CNT = CNT + 1;
+					LINE2 :
+						if (CNT >= 20) CNT = 0; 
+						else CNT = CNT + 1;
+					CLEAR_DISP :
+						if (CNT >= 200) CNT = 0; 
+						else CNT = CNT + 1;
+					default : CNT = 0; 
+				endcase
+			end
+	end
+
+
+always @(posedge CLK) 
+	begin
+		if (RESETN == 1'b0)
+			begin
+				LCD_RS = 1'b1; 
+				LCD_RW = 1'b1;
+				LCD_DATA = 8'b00000000;
+			end 
+		else
+			begin
+				case (STATE) 
+					FUNCTION_SET :
+						begin
+							LCD_RS = 1'b0; 
+							LCD_RW = 1'b0;
+							LCD_DATA = 8'b00111100;
+						end
+
+					DISP_ONOFF :
+						begin
+							LCD_RS = 1'b0; 
+							LCD_RW = 1'b0;
+							LCD_DATA = 8'b00001100;
+						end
+
+					ENTRY_MODE :
+						begin
+							LCD_RS = 1'b0; 
+							LCD_RW = 1'b0;
+							LCD_DATA = 8'b00000110;
+						end
+
+					LINE1 :
+						begin
+
+							LCD_RW = 1'b0;
+
+							case (CNT) 
+								0 :
+									begin
+										LCD_RS = 1'b0;
+										LCD_DATA = 8'b10000000;
+									end
+								1 :
+									begin
+										LCD_RS = 1'b1;
+										case(H10)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9
+										endcase						
+									end
+								2 :
+									begin
+										LCD_RS = 1'b1;
+										case(H1)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9
+										endcase						
+									end
+								3 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00111010; //:
+									end
+								4 :
+									begin
+										LCD_RS = 1'b1;
+										case(M10)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9
+										endcase						 //M10
+									end
+								5 :
+									begin
+										LCD_RS = 1'b1;
+										case(M1)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9									
+										endcase						
+									end
+								6 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00111010; //:
+									end
+								7 :
+									begin
+										LCD_RS = 1'b1;
+										case(S10)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9
+										endcase						 //S10
+									end
+								8 :
+									begin
+										LCD_RS = 1'b1;
+										case(S1)
+											4'b0000: LCD_DATA =8'b00110000; //0
+											4'b0001: LCD_DATA =8'b00110001; //1
+											4'b0010: LCD_DATA =8'b00110010; //2
+											4'b0011: LCD_DATA =8'b00110011; //3
+											4'b0100: LCD_DATA =8'b00110100; //4
+											4'b0101: LCD_DATA =8'b00110101; //5
+											4'b0110: LCD_DATA =8'b00110110; //6
+											4'b0111: LCD_DATA =8'b00110111; //7
+											4'b1000: LCD_DATA =8'b00111000; //8
+											4'b1001: LCD_DATA =8'b00111001; //9
+										endcase					 //S1
+									end
+								9 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end
+								10 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end
+								11 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end
+								12 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end
+								13 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end							
+								14 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end							
+								15 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //
+									end 
+								16 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; // 
+									end
+								default :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000;
+									end	
+								endcase
+							end 
+												
+						CLEAR_DISP :
+							begin
+								LCD_RS = 1'b0;
+								LCD_RW = 1'b0;
+								LCD_DATA = 8'b00000001;
+							end
+
+						default : 
+							begin
+								LCD_RS = 1'b1; 
+								LCD_RW = 1'b1;
+								LCD_DATA = 8'b00000000;
+							end 
+					endcase
+			end
+		end
+assign LCD_E = CLK; 
+endmodule
