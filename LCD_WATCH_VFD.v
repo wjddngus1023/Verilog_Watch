@@ -1,4 +1,3 @@
-
 module LCD_WATCH_VFD( 
 	RESETN,CLK,
 	LCD_E, LCD_RS, LCD_RW, 
@@ -131,6 +130,26 @@ always @(posedge CLK)
 								1 :
 									begin
 										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //NULL
+									end
+								2 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //NULL
+									end
+								3 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //NULL
+									end
+								4 :
+									begin
+										LCD_RS = 1'b1;
+										LCD_DATA = 8'b00100000; //NULL
+									end
+								5 :
+									begin
+										LCD_RS = 1'b1;
 										case(H10)
 											4'b0000: LCD_DATA =8'b00110000; //0
 											4'b0001: LCD_DATA =8'b00110001; //1
@@ -144,7 +163,7 @@ always @(posedge CLK)
 											4'b1001: LCD_DATA =8'b00111001; //9
 										endcase						
 									end
-								2 :
+								6 :
 									begin
 										LCD_RS = 1'b1;
 										case(H1)
@@ -160,12 +179,12 @@ always @(posedge CLK)
 											4'b1001: LCD_DATA =8'b00111001; //9
 										endcase						
 									end
-								3 :
+								7 :
 									begin
 										LCD_RS = 1'b1;
 										LCD_DATA = 8'b00111010; //:
 									end
-								4 :
+								8 :
 									begin
 										LCD_RS = 1'b1;
 										case(M10)
@@ -181,7 +200,7 @@ always @(posedge CLK)
 											4'b1001: LCD_DATA =8'b00111001; //9
 										endcase						 //M10
 									end
-								5 :
+								9 :
 									begin
 										LCD_RS = 1'b1;
 										case(M1)
@@ -195,14 +214,14 @@ always @(posedge CLK)
 											4'b0111: LCD_DATA =8'b00110111; //7
 											4'b1000: LCD_DATA =8'b00111000; //8
 											4'b1001: LCD_DATA =8'b00111001; //9									
-										endcase						
+										endcase						//M1
 									end
-								6 :
+								10 :
 									begin
 										LCD_RS = 1'b1;
 										LCD_DATA = 8'b00111010; //:
 									end
-								7 :
+								11 :
 									begin
 										LCD_RS = 1'b1;
 										case(S10)
@@ -218,7 +237,7 @@ always @(posedge CLK)
 											4'b1001: LCD_DATA =8'b00111001; //9
 										endcase						 //S10
 									end
-								8 :
+								12 :
 									begin
 										LCD_RS = 1'b1;
 										case(S1)
@@ -234,45 +253,25 @@ always @(posedge CLK)
 											4'b1001: LCD_DATA =8'b00111001; //9
 										endcase					 //S1
 									end
-								9 :
-									begin
-										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end
-								10 :
-									begin
-										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end
-								11 :
-									begin
-										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end
-								12 :
-									begin
-										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end
 								13 :
 									begin
 										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
+										LCD_DATA = 8'b00100000; //NULL
 									end							
 								14 :
 									begin
 										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end							
+										LCD_DATA = 8'b00100000; //NULL
+									end						
 								15 :
 									begin
 										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; //
-									end 
+										LCD_DATA = 8'b00100000; //NULL
+									end
 								16 :
 									begin
 										LCD_RS = 1'b1;
-										LCD_DATA = 8'b00100000; // 
+										LCD_DATA = 8'b00100000; //NULL
 									end
 								default :
 									begin
