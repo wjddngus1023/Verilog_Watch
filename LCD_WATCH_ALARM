@@ -1,0 +1,101 @@
+//LCD_WATCH_ALARM
+
+module LCD_WATCH_ALARM(RESETN,CLK,KEY,
+	ALARM_TIME);
+
+	input RESETN,CLK;
+	input [7:0] KEY;
+	reg [3:0] UPH,DOWNH,UPM,DOWNM,UPS,DOWNS,CLEAR;
+	
+	integer HOUR,MIN,SEC;
+	
+	reg [2:0] ALARM_TIME;
+	output ALARM_TIME;
+	
+	always @(KEY)
+begin
+		case(KEY)
+			8'b10000000 : ALARM_TIME = UPH; //HOUR+1
+			8'b01000000 : ALARM_TIME = DOWNH; //HOUR-1
+			8'b00100000 : ALARM_TIME = UPM; //MIN+1
+			8'b00010000 : ALARM_TIME = DOWNM; //MIN-1
+			8'b00001000 : ALARM_TIME = UPS; //SEC+1
+			8'b00000100 : ALARM_TIME = DOWNS; //SEC-1
+			8'b00000010 : ALARM_TIME = CLEAR; //RESET TIME
+			default : ALARM_TIME = CLEAR;
+		endcase
+	end
+	
+	always @(KEY)
+begin  
+	if(UPH)
+		begin 
+			HOUR = HOUR + 1;
+		end
+				
+		begin
+			if(HOUR>=23)
+				HOUR=23;
+		end
+	
+	if(DOWNH)
+		begin 
+			HOUR = HOUR - 1;
+		end
+				
+		begin
+			if(HOUR<=0)
+				HOUR=0;
+		end
+		
+	if(UPM)
+		begin 
+			MIN = MIN + 1;
+		end
+				
+		begin
+			if(MIN>=59)
+				MIN=59;
+		end	
+		
+		if(DOWNM)
+		begin 
+			MIN = MIN - 1;
+		end
+				
+		begin
+			if(MIN<=0)
+				MIN=0;
+		end
+		
+		if(UPS)
+		begin 
+			SEC = SEC + 1;
+		end
+				
+		begin
+			if(SEC>=59)
+				SEC=59;
+			end
+			
+		if(DOWNS)
+		begin 
+			SEC = SEC - 1;
+		end
+				
+		begin
+			if(SEC<=0)
+				SEC=0;
+			end	
+			
+		if(CLEAR)
+		begin 
+			HOUR=0;
+			MIN=0;
+			SEC=0;
+		end	
+end
+	
+	
+	
+	endmodule
